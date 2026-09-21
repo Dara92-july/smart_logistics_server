@@ -40,7 +40,7 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log("Database connected");
     if (process.env.DB_SYNC === "true") {
-      await sequelize.sync({ alter: true });
+      await sequelize.sync({ force: true });
       console.log("Database synced");
     }
   } catch (error) {
