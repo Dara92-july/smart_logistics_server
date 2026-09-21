@@ -7,18 +7,17 @@ const databaseUrl = process.env.DATABASE_URL;
 
 let sequelize;
 
-if (databaseUrl) {
-  const isPostgres = databaseUrl.startsWith("postgres");
-  const url = isPostgres && databaseUrl.startsWith("postgres://")
+  if (databaseUrl) {
+  const url = databaseUrl.startsWith("postgres://")
     ? databaseUrl.replace("postgres://", "postgresql://")
     : databaseUrl;
   sequelize = new Sequelize(url, {
     dialect: "postgres",
     dialectOptions: {
-      ssl: { require: true, rejectUnauthorized: false },
+      ssl: { require: false, rejectUnauthorized: false },
     },
-    logging: false,
-    pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
+    logging: console.log,
+    pool: { max: 10, min: 0, acquire: 60000, idle: 10000 },
   });
 } else {
   sequelize = new Sequelize(
@@ -44,8 +43,8 @@ const connectDB = async () => {
       console.log("Database synced");
     }
   } catch (error) {
-    console.error("Database connection failed:", error.message);
-    process.exit(1);
+    console.error("Database connection failed:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    throw error;
   }
 };
 

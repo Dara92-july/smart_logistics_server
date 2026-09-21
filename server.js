@@ -94,8 +94,18 @@ connectDB().then(async () => {
     console.log(`Server running on port ${PORT}`)
   })
 }).catch(err => {
-  console.error('Failed to start server:', err.message || err)
-  process.exit(1)
+  console.error('DB connection failed, retrying in 10s...')
+  setTimeout(() => {
+    connectDB().then(async () => {
+      await seedAdmin()
+      httpServer.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`)
+      })
+    }).catch(err2 => {
+      console.error('Final DB error:', err2.message || err2)
+      process.exit(1)
+    })
+  }, 10000)
 })
 
 export { io, sequelize }
