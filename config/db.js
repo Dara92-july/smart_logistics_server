@@ -4,6 +4,7 @@ dotenv.config();
 import { Sequelize } from "sequelize";
 
 const databaseUrl = process.env.DATABASE_URL;
+console.log("DATABASE_URL host:", databaseUrl ? new URL(databaseUrl.replace("postgresql://", "http://")).hostname : "not set");
 
 let sequelize;
 
