@@ -9,9 +9,14 @@ let sequelize;
 
 if (databaseUrl) {
   const isPostgres = databaseUrl.startsWith("postgres");
-  sequelize = new Sequelize(databaseUrl, {
-    dialect: isPostgres ? "postgres" : "mysql",
-    dialectOptions: isPostgres ? { ssl: { require: true, rejectUnauthorized: false } } : {},
+  const url = isPostgres && databaseUrl.startsWith("postgres://")
+    ? databaseUrl.replace("postgres://", "postgresql://")
+    : databaseUrl;
+  sequelize = new Sequelize(url, {
+    dialect: "postgres",
+    dialectOptions: {
+      ssl: { require: true, rejectUnauthorized: false },
+    },
     logging: false,
     pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
   });
@@ -33,13 +38,13 @@ if (databaseUrl) {
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log(`Database connected: ${sequelize.config.host || "remote"}`);
+    console.log("Database connected");
     if (process.env.DB_SYNC === "true") {
       await sequelize.sync({ alter: true });
       console.log("Database synced");
     }
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error("Database connection failed:", error.message);
     process.exit(1);
   }
 };
