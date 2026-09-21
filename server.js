@@ -24,9 +24,15 @@ dotenv.config()
 
 const app = express()
 const httpServer = createServer(app)
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://smartlogisticsclient.vercel.app',
+  'http://localhost:3000'
+].filter(Boolean)
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || true,
+    origin: allowedOrigins,
     credentials: true
   }
 })
@@ -34,7 +40,7 @@ const io = new Server(httpServer, {
 // Security middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.CLIENT_URL || true,
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
