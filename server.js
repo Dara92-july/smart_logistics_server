@@ -26,9 +26,7 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === 'production'
-      ? process.env.CLIENT_URL
-      : [/^http:\/\/localhost:\d+$/],
+    origin: process.env.CLIENT_URL || true,
     credentials: true
   }
 })
@@ -36,10 +34,10 @@ const io = new Server(httpServer, {
 // Security middleware
 app.use(helmet())
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.CLIENT_URL
-    : [/^http:\/\/localhost:\d+$/],
-  credentials: true
+  origin: process.env.CLIENT_URL || true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(compression())
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
